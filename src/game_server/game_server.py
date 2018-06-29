@@ -1,7 +1,8 @@
+import socket
 import pygame
 import logging
 from PIL import Image
-from rgbmatrix import RGBMatrix
+from rgbmatrix import RGBMatrix, graphics
 
 from infra.app import app
 from infra.modules.sensors.mpr121 import electrodes
@@ -22,6 +23,14 @@ class GameServer(app.App):
 
         self.electrodes = electrodes.Mpr121ElectrodesGrid(
             constants.MPR121_MAP, constants.ELECTRODES_SIZE, constants.RGB_MATRIX_SIZE)
+
+        canvas = self.matrix.CreateFrameCanvas()
+        font = graphics.Font()
+        font.LoadFont("/home/pi/Public/rpi-rgb-led-matrix/fonts/5x7.bdf")
+        my_text = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
+        for i, t in enumerate(my_text.split('.')):
+            graphics.DrawText(canvas, font, 1, 7 + i * 8, graphics.Color(255, 255, 0), t)
+        canvas = self.matrix.SwapOnVSync(canvas)
 
     def draw_pil_string(self, s):
         pil_image = Image.frombytes('RGB', constants.RGB_MATRIX_SIZE, s)
