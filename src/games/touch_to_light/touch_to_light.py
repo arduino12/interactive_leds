@@ -22,6 +22,7 @@ class TouchToLight(app.App):
 
         self.game = app_client._App()
         self.game.reconnect()
+        self.game_constants = self.game._modules[0]
 
         self._runner_q = Queue()
         self._runner = Thread(target=self.run, daemon=True)
@@ -33,7 +34,7 @@ class TouchToLight(app.App):
     
     def run(self):
         status = 1
-        s = pygame.Surface(constants.RGB_MATRIX_SIZE)
+        s = pygame.Surface(self.game_constants.RGB_MATRIX_SIZE)
         
         while status:
             time.sleep(0.01)
@@ -46,6 +47,7 @@ class TouchToLight(app.App):
 
             for i in self.game.electrodes.get_newly_touched():
                 x, y = i.mid_pixel
+                self._logger.info('elec %s, %s', i.index, i.grid_indexes)
                 pygame.draw.ellipse(s, (random.randrange(256), random.randrange(256), random.randrange(256)), (x - 4, y - 4, 8, 8), random.randrange(4))
             for i in self.game.electrodes.get_newly_released():
                 x, y = i.mid_pixel
