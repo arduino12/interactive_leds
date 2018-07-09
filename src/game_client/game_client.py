@@ -8,6 +8,7 @@ from threading import Thread
 
 from infra.app import app
 from infra.run import app_client
+from infra.core import utils
 
 
 class GameClient(app.App):
@@ -18,7 +19,7 @@ class GameClient(app.App):
 
         self.gameplay = app_client._App()
         self.gameplay.reconnect()
-        self.gameplay_constants = self.gameplay._modules[0]
+        self.gameplay.constants = self.gameplay._modules[0]
 
         self.last_pil_string = ''
         self.gameplay.draw_surface = self.draw_surface
@@ -26,7 +27,8 @@ class GameClient(app.App):
         game_path = sys.argv[-1]
         game_base, game_name = game_path.rsplit('.', 1)
         game_class = importlib.import_module(game_path)
-        self.game = getattr(game_class, game_name)(self.gameplay)
+        self.game = getattr(
+            game_class, utils.module_to_class_name(game_name))(self.gameplay)
 
         self._runner_q = Queue()
         self._runner = Thread(target=self.run, daemon=True)
