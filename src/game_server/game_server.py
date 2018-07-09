@@ -24,6 +24,7 @@ class GameServer(app.App):
         self.electrodes = electrodes.Mpr121ElectrodesGrid(
             constants.MPR121_MAP, constants.ELECTRODES_SIZE,
             constants.RGB_MATRIX_SIZE)
+        self.electrodes.init()
 
         self.canvas = self.matrix.CreateFrameCanvas()
 
