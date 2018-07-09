@@ -1,0 +1,4 @@
+**/__pycache__
+*.pyc
+**/RT_JoystickEventLogFile*.csv
+*.egg-info/
