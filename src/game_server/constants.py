@@ -1,8 +1,6 @@
 import socket
 import logging
-import os.path
 
-from infra.core.ansi import Ansi
 from infra.run.common import *
 from rgbmatrix import RGBMatrixOptions
 

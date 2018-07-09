@@ -2,7 +2,7 @@ import random
 import pygame
 import logging
 
-from interactive_leds.src.games.touch_test import constants
+from . import constants
 
 
 class TouchTest(object):
@@ -16,7 +16,7 @@ class TouchTest(object):
         while True:
             for i in self.gameplay.electrodes.get_newly_touched():
                 x, y = i.mid_pixel
-                self._logger.info('elec %s, %s', i.index, i.grid_indexes)
+                self._logger.info('elec %s,\t%s', i.index, i.grid_indexes)
                 pygame.draw.ellipse(
                     self.surface,
                     tuple(random.randrange(256) for _ in range(3)),
@@ -24,7 +24,7 @@ class TouchTest(object):
             for i in self.gameplay.electrodes.get_newly_released():
                 x, y = i.mid_pixel
                 pygame.draw.ellipse(
-                    self.surface, (0, 0, 0), (x - 4, y - 4, 8, 8))
+                    self.surface, (0, 20, 0), (x - 4, y - 4, 8, 8))
 
             self.gameplay.draw_surface(self.surface)
 

@@ -6,6 +6,7 @@ import importlib
 from queue import Queue
 from threading import Thread
 
+from . import constants
 from infra.app import app
 from infra.run import app_client
 from infra.core import utils
@@ -15,20 +16,22 @@ class GameClient(app.App):
     _logger = logging.getLogger('game_client')
 
     def __init__(self, globals):
-        app.App.__init__(self)
+        app.App.__init__(self, constants)
 
         self.gameplay = app_client._App()
         self.gameplay.reconnect()
         self.gameplay.constants = self.gameplay._modules[0]
 
-        self.last_pil_string = ''
+        self._last_pil_string = ''
         self.gameplay.draw_surface = self.draw_surface
 
         game_path = sys.argv[-1]
-        game_base, game_name = game_path.rsplit('.', 1)
-        game_class = importlib.import_module(game_path)
-        self.game = getattr(
-            game_class, utils.module_to_class_name(game_name))(self.gameplay)
+        game_module = importlib.import_module(game_path)
+        game_class = getattr(
+            game_module,
+            utils.module_to_class_name(game_path.rsplit('.', 1)[1]))
+        self.game = game_class(self.gameplay)
+        self._modules.append(game_module)
 
         self._runner_q = Queue()
         self._runner = Thread(target=self.run, daemon=True)
@@ -53,9 +56,10 @@ class GameClient(app.App):
 
     def draw_surface(self, surface):
         pil_string = pygame.image.tostring(surface, 'RGB', False)
-        if self.last_pil_string != pil_string:
-            self.last_pil_string = pil_string
+        if self._last_pil_string != pil_string:
+            self._last_pil_string = pil_string
             self.gameplay.draw_pil_string(pil_string)
 
     def __exit__(self):
+        self.set_run(False)
         app.App.__exit__(self)

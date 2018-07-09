@@ -3,9 +3,9 @@ import logging
 from PIL import Image
 from rgbmatrix import RGBMatrix, graphics
 
+from . import constants
 from infra.app import app
 from infra.modules.sensors.mpr121 import electrodes
-from interactive_leds.src.game_server import constants
 
 
 class GameServer(app.App):
@@ -14,8 +14,8 @@ class GameServer(app.App):
     def __init__(self, globals):
         app.App.__init__(self, constants)
         self._modules.extend((
-            electrodes.mpr121.registers_tree, electrodes.mpr121.i2c_mux,
-            electrodes.mpr121, electrodes))
+            electrodes.mpr121.registers_tree, electrodes.mpr121,
+            electrodes.i2c_mux, electrodes))
 
         if not hasattr(globals, 'matrix'):
             globals.matrix = RGBMatrix(options=constants.RGB_MATRIX_OPTIONS)
