@@ -1,3 +1,4 @@
+import socket
 import logging
 import os.path
 
@@ -7,7 +8,7 @@ from rgbmatrix import RGBMatrixOptions
 
 # LOGOR_LEVEL = logging.DEBUG
 
-HARDWARE_VERSION = 2
+HARDWARE_VERSION = 1
 
 RGB_MATRIX_OPTIONS = RGBMatrixOptions()
 RGB_MATRIX_OPTIONS.rows = 16
@@ -18,19 +19,24 @@ RGB_MATRIX_OPTIONS.drop_privileges = False
 RGB_MATRIX_OPTIONS.led_rgb_sequence = 'RGB'
 RGB_MATRIX_OPTIONS.hardware_mapping = 'free-i2c'
 
+
 def _update_gamepad_params(panels_width, panels_height, snake):
-    GAMEPAD_PANELS_WIDTH, GAMEPAD_PANELS_HEIGHT = GAMEPAD_PANELS_SIZE = (panels_width, panels_height)
+    GAMEPAD_PANELS_WIDTH, GAMEPAD_PANELS_HEIGHT = GAMEPAD_PANELS_SIZE = (
+        panels_width, panels_height)
     RGB_MATRIX_WIDTH, RGB_MATRIX_HEIGHT = RGB_MATRIX_SIZE = (
         GAMEPAD_PANELS_WIDTH * RGB_MATRIX_OPTIONS.cols,
         GAMEPAD_PANELS_HEIGHT * RGB_MATRIX_OPTIONS.rows)
     ELECTRODE_SIZE = 8
     ELECTRODES_WIDTH, ELECTRODES_HEIGHT = ELECTRODES_SIZE = (
-        RGB_MATRIX_WIDTH // ELECTRODE_SIZE, RGB_MATRIX_HEIGHT // ELECTRODE_SIZE)
+        RGB_MATRIX_WIDTH // ELECTRODE_SIZE,
+        RGB_MATRIX_HEIGHT // ELECTRODE_SIZE)
     ELECTRODES_COUNT = ELECTRODES_WIDTH * ELECTRODES_HEIGHT
     RGB_MATRIX_OPTIONS.parallel = panels_height // snake
-    RGB_MATRIX_OPTIONS.chain_length = GAMEPAD_PANELS_WIDTH * GAMEPAD_PANELS_HEIGHT // RGB_MATRIX_OPTIONS.parallel
+    RGB_MATRIX_OPTIONS.chain_length = GAMEPAD_PANELS_WIDTH * \
+        GAMEPAD_PANELS_HEIGHT // RGB_MATRIX_OPTIONS.parallel
     RGB_MATRIX_OPTIONS.pixel_mapper_config = 'Snake:%s' % (snake,)
     globals().update(locals())
+
 
 if HARDWARE_VERSION == 0:
     _update_gamepad_params(1, 2, 2)
@@ -63,12 +69,20 @@ elif HARDWARE_VERSION == 2:
     RGB_MATRIX_OPTIONS.gpio_slowdown = 2
     RGB_MATRIX_OPTIONS.multiplexing = 4
     RGB_MATRIX_OPTIONS.pwm_bits = 8
-    MPR121_PANEL_ELECTRODES_MAP = [
+    MPR121_ELECTRODES_MAP = [
         [2, 3, 15, 14, 13, 12, 0, 1], [13, 12, 0, 1, 2, 3, 15, 14]
     ]
     MPR121_MAP = []
     for mux_addr_off in range(GAMEPAD_PANELS_WIDTH):
         for mux_sub_index in range(GAMEPAD_PANELS_HEIGHT):
             i = mux_addr_off * 4 + mux_sub_index * 24
-            MPR121_MAP.append((mux_addr_off, mux_sub_index + 2, 0,
-                [i + j for j in MPR121_PANEL_ELECTRODES_MAP[mux_sub_index % 2]]))
+            MPR121_MAP.append((
+                mux_addr_off, mux_sub_index + 2, 0,
+                [i + j for j in MPR121_ELECTRODES_MAP[mux_sub_index % 2]]))
+
+LOCAL_IP = ((
+    [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2]
+        if not ip.startswith('127.')] or
+    [[(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close())
+        for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]]
+        [0][1]]) + ['no IP found'])[0]

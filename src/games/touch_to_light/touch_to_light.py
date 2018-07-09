@@ -1,12 +1,9 @@
-import os
 import time
 import random
 import pygame
 import logging
-import functools
 from queue import Queue
 from threading import Thread
-from PIL import Image, ImageDraw
 
 from infra.app import app
 from infra.run import app_client
@@ -15,7 +12,6 @@ from interactive_leds.src.games.touch_to_light import constants
 
 class TouchToLight(app.App):
     _logger = logging.getLogger('touch_to_light')
-
 
     def __init__(self, globals):
         app.App.__init__(self, constants)
@@ -31,11 +27,11 @@ class TouchToLight(app.App):
 
     def set_run(self, is_run):
         self._runner_q.put(2 if is_run else 1)
-    
+
     def run(self):
         status = 1
         s = pygame.Surface(self.game_constants.RGB_MATRIX_SIZE)
-        
+
         while status:
             time.sleep(0.01)
             if not self._runner_q.empty():
@@ -48,7 +44,9 @@ class TouchToLight(app.App):
             for i in self.game.electrodes.get_newly_touched():
                 x, y = i.mid_pixel
                 self._logger.info('elec %s, %s', i.index, i.grid_indexes)
-                pygame.draw.ellipse(s, (random.randrange(256), random.randrange(256), random.randrange(256)), (x - 4, y - 4, 8, 8), random.randrange(4))
+                pygame.draw.ellipse(
+                    s, (random.randrange(256) for _ in range(3)),
+                    (x - 4, y - 4, 8, 8), random.randrange(4))
             for i in self.game.electrodes.get_newly_released():
                 x, y = i.mid_pixel
                 pygame.draw.ellipse(s, (0, 0, 0), (x - 4, y - 4, 8, 8))
