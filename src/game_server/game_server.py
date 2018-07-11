@@ -32,11 +32,11 @@ class GameServer(app.App):
             constants.RGB_MATRIX_SIZE)
         self.electrodes.init()
 
+        self._runner = None
         self._last_pil_string = ''
         self.constants = constants
         self.canvas = self.matrix.CreateFrameCanvas()
 
-        # self._logger.error(str(sys.argv))
         if len(sys.argv) <= 5:
             font = graphics.Font()
             font.LoadFont('/home/pi/Public/rpi-rgb-led-matrix/fonts/5x7.bdf')
@@ -56,24 +56,38 @@ class GameServer(app.App):
             self._modules.append(game_module)
 
             self._runner_q = Queue()
-            self._runner = Thread(target=self.run, daemon=True)
+            self._runner = Thread(target=self._run, daemon=True)
             self._runner.start()
             self.set_run(True)
 
-    def run(self):
+    def _run(self):
         status = 1
-        while status:
-            time.sleep(0.001)
-            if not self._runner_q.empty():
-                status = self._runner_q.get()
-            if status == 1:
-                continue
+        try:
+            while status:
+                time.sleep(0.001)
+                if not self._runner_q.empty():
+                    status = self._runner_q.get()
+                if status == 1:
+                    continue
 
-            self.electrodes.update()
-            self.game.loop(True)
+                self.electrodes.update()
+                self.game.loop(True)
+        except Exception:
+            self._logger.exception('runner error:')
+            self.__exit__()
+        else:
+            self._logger.info('runner exited')
+
+    def _set_runner(self, status):
+        if self._runner is not None:
+            self._runner_q.put(status)
+            if not status:
+                self._runner.join(1)
+                if self._runner.is_alive():
+                    self._logger.error('runner is still alive')
 
     def set_run(self, is_run):
-        self._runner_q.put(2 if is_run else 1)
+        self._set_runner(2 if is_run else 1)
 
     def draw_pil_string(self, s):
         pil_image = Image.frombytes('RGB', constants.RGB_MATRIX_SIZE, s)
@@ -88,4 +102,5 @@ class GameServer(app.App):
             self.draw_pil_string(pil_string)
 
     def __exit__(self):
+        self._set_runner(0)
         app.App.__exit__(self)

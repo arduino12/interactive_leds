@@ -3,6 +3,7 @@ sudo nano /home/pi/.bash_aliases
 
 alias led_server_log='sudo journalctl -e -f -n 50 -o cat -u led_server.service'
 alias led_server_log_all='sudo journalctl --no-tail --no-pager -m -o cat -u led_server.service'
+alias led_server_stop='sudo systemctl stop led_server.service'
 alias led_server_restart='sudo systemctl restart led_server.service'
 alias led_server_client='/home/pi/Public/infra/scripts/run_client.sh'
 
@@ -86,4 +87,5 @@ make led-image-viewer
 
 sudo i2cdetect -y 1
 sudo i2cset -y 1 0x70 0 1
-sudo /home/pi/Public/rpi-rgb-led-matrix/examples-api-use/demo --led-rows 16 --led-cols 32 --led-chain 4 --led-brightness 100 --led-pwm-bits 11 --led-show-refresh --led-parallel 1 --led-gpio-mapping free-i2c --led-pixel-mapper 'Snake' --led-multiplexing 4 --led-slowdown-gpio=2 --led-pwm-dither-bits 0 -D9
+
+sudo /home/pi/Public/rpi-rgb-led-matrix/examples-api-use/demo --led-rows 16 --led-cols 32 --led-chain 4 --led-brightness 90 --led-pwm-bits 8 --led-show-refresh --led-parallel 1 --led-gpio-mapping free-i2c --led-pixel-mapper 'Snake' --led-multiplexing 4 --led-slowdown-gpio 2 --led-pwm-dither-bits 0 -D9
