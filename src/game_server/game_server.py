@@ -51,7 +51,7 @@ class GameServer(app.App):
             game_module = importlib.import_module(game_path)
             game_class = getattr(
                 game_module,
-                utils.module_to_class_name(game_path.rsplit('.', 1)[1]))
+                utils.module_to_class_name(game_path.rsplit('.', 1)[-1]))
             self.game = game_class(self)
             self._modules.append(game_module)
 
