@@ -20,15 +20,9 @@ class InteractiveLedsSimulator(object):
         # create paws, electrodes and leds objects
         self.paws = paws.Paws(self.window_surface, constants.PAWS_PATH)
         self.electrodes = electrodes.SimulatorElectrodes(
-            constants.ELECTRODES_SIZE, constants.RGB_MATRIX_SIZE, self.paws)
+            constants.ELECTRODES_SIZE, constants.RGB_MATRIX_SIZE, self.paws,
+            constants.LED_MAP, constants.LED_SEP_PIXELS // 2)
         self.leds_surface = pygame.Surface(self.window_surface.get_size())
-        # add mid_point and rect to electrodes
-        mid_pixel = constants.LED_SEP_PIXELS // 2
-        for i in self.electrodes.electrodes:
-            i.mid_point = ([
-            constants.LED_MAP[p] - mid_pixel for p in i.mid_pixel])
-            i.rect = pygame.Rect(
-                i.top_left_pixel, self.electrodes.elec_pixel_sizes)
 
         self.constants = constants
         self.running = True

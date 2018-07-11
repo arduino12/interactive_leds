@@ -11,7 +11,7 @@ from rgbmatrix import RGBMatrix, graphics
 from . import constants
 from infra.app import app
 from infra.core import utils
-from infra.modules.sensors.mpr121 import electrodes
+from infra.modules.sensors.mpr121 import mpr121_electrodes
 
 
 class GameServer(app.App):
@@ -20,22 +20,23 @@ class GameServer(app.App):
     def __init__(self, globals):
         app.App.__init__(self, constants)
         self._modules.extend((
-            electrodes.mpr121.registers_tree, electrodes.mpr121,
-            electrodes.i2c_mux, electrodes))
+            mpr121_electrodes.mpr121.registers_tree, mpr121_electrodes.mpr121,
+            mpr121_electrodes.i2c_mux, mpr121_electrodes))
 
         if not hasattr(globals, 'matrix'):
             globals.matrix = RGBMatrix(options=constants.RGB_MATRIX_OPTIONS)
         self.matrix = globals.matrix
 
-        self.electrodes = electrodes.Mpr121ElectrodesGrid(
-            constants.MPR121_MAP, constants.ELECTRODES_SIZE,
-            constants.RGB_MATRIX_SIZE)
+        self.electrodes = mpr121_electrodes.Mpr121Electrodes(
+            constants.ELECTRODES_SIZE, constants.RGB_MATRIX_SIZE,
+            constants.MPR121_MAP)
         self.electrodes.init()
 
         self._runner = None
         self._last_pil_string = ''
         self.constants = constants
         self.canvas = self.matrix.CreateFrameCanvas()
+        self.running = True
 
         if len(sys.argv) <= 5:
             font = graphics.Font()
@@ -70,7 +71,6 @@ class GameServer(app.App):
                 if status == 1:
                     continue
 
-                self.electrodes.update()
                 self.game.loop(True)
         except Exception:
             self._logger.exception('runner error:')

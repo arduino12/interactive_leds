@@ -20,7 +20,7 @@ class TouchTest(object):
     def _get_rand_color():
         return tuple(random.randrange(256) for _ in range(3))
 
-    def loop(self):
+    def loop(self, single=False):
         while self.gameplay.running:
             # limit framerate
             time_diff = self.fps_clock.tick(constants.FPS)
@@ -42,3 +42,6 @@ class TouchTest(object):
                     self.surface, constants.RELEASED_COLOR, i.rect)
             # update display
             self.gameplay.draw_surface(self.surface)
+            # return for single loop
+            if single:
+                return
