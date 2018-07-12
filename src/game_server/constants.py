@@ -17,6 +17,7 @@ RGB_MATRIX_OPTIONS.drop_privileges = False
 RGB_MATRIX_OPTIONS.led_rgb_sequence = 'RGB'
 RGB_MATRIX_OPTIONS.hardware_mapping = 'free-i2c'
 
+MPR121_MAP = []
 
 def _update_gamepad_params(panels_width, panels_height, snake):
     GAMEPAD_PANELS_WIDTH, GAMEPAD_PANELS_HEIGHT = GAMEPAD_PANELS_SIZE = (
@@ -47,7 +48,7 @@ if HARDWARE_VERSION == 0:
         (None, None, 0, [14, 13, 15, 12, 11, 8, 10, 9]),
     ]
 elif HARDWARE_VERSION == 1:
-    _update_gamepad_params(2, 2, 2)
+    _update_gamepad_params(2, 3, 3)
     RGB_MATRIX_OPTIONS.brightness = 80
     RGB_MATRIX_OPTIONS.gpio_slowdown = 2
     RGB_MATRIX_OPTIONS.multiplexing = 4
@@ -55,25 +56,32 @@ elif HARDWARE_VERSION == 1:
     # RGB_MATRIX_OPTIONS.scan_mode = 1
     # RGB_MATRIX_OPTIONS.pwm_lsb_nanoseconds = 500
     # RGB_MATRIX_OPTIONS.disable_hardware_pulsing = True
-    MPR121_MAP = [
-        (None, None, 0, [6, 7, 14, 15, 12, 13, 4, 5]),
-        (None, None, 1, [8, 9, 10, 11, 3, 2, 1, 0]),
-        (None, None, 2, [25, 24, 16, 17, 18, 19, 27, 26]),
-        (None, None, 3, [29, 28, 20, 21, 22, 23, 31, 30]),
+
+    MPR121_ELECTRODES_MAP = [
+        [2, 3, 11, 10, 9, 8, 0, 1], [9, 8, 0, 1, 2, 3, 11, 10]
     ]
+    mux_sub_index = 0
+    for y in range(GAMEPAD_PANELS_HEIGHT):
+        i = y * ELECTRODES_COUNT // GAMEPAD_PANELS_HEIGHT
+        for x in range(GAMEPAD_PANELS_WIDTH):
+            MPR121_MAP.append((
+                0, mux_sub_index + 2, 0,
+                [i + j for j in MPR121_ELECTRODES_MAP[y % 2]]))
+            mux_sub_index += 1
+            i += ELECTRODES_WIDTH // GAMEPAD_PANELS_WIDTH
 elif HARDWARE_VERSION == 2:
     _update_gamepad_params(3, 6, 2)
     RGB_MATRIX_OPTIONS.brightness = 70
     RGB_MATRIX_OPTIONS.gpio_slowdown = 2
     RGB_MATRIX_OPTIONS.multiplexing = 4
     RGB_MATRIX_OPTIONS.pwm_bits = 8
+
     MPR121_ELECTRODES_MAP = [
         [2, 3, 15, 14, 13, 12, 0, 1], [13, 12, 0, 1, 2, 3, 15, 14]
     ]
-    MPR121_MAP = []
     for mux_addr_off in range(GAMEPAD_PANELS_WIDTH):
         for mux_sub_index in range(GAMEPAD_PANELS_HEIGHT):
-            i = mux_addr_off * 4 + mux_sub_index * 24
+            i = mux_addr_off * 4 + mux_sub_index * ELECTRODES_COUNT // GAMEPAD_PANELS_HEIGHT
             MPR121_MAP.append((
                 mux_addr_off, mux_sub_index + 2, 0,
                 [i + j for j in MPR121_ELECTRODES_MAP[mux_sub_index % 2]]))
