@@ -44,24 +44,25 @@ class InteractiveLedsSimulator(object):
                         constants.LED_SIZE_PIXELS, constants.LED_SIZE_PIXELS))
         self._draw_display()
 
-    def handle_event(self, event):
+    def handle_events(self, events):
         needs_redraw = False
-        if event.type == pygame.MOUSEMOTION:
-            self.paws.selected_paw.set_mouse_pos(event.pos)
-            needs_redraw = True
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                self.paws.selected_paw.toggle_press()
-            elif event.button == 3:
-                self.paws.select_next_paw()
-                pygame.mouse.set_pos(self.paws.selected_paw.get_mouse_pos())
-            needs_redraw = True
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+        for i in events:
+            if i.type == pygame.MOUSEMOTION:
+                self.paws.selected_paw.set_mouse_pos(i.pos)
+                needs_redraw = True
+            elif i.type == pygame.MOUSEBUTTONDOWN:
+                if i.button == 1:
+                    self.paws.selected_paw.toggle_press()
+                elif i.button == 3:
+                    self.paws.select_next_paw()
+                    pygame.mouse.set_pos(
+                        self.paws.selected_paw.get_mouse_pos())
+                needs_redraw = True
+            elif i.type == pygame.KEYDOWN:
+                if i.key == pygame.K_ESCAPE:
+                    self.running = False
+            elif i.type == pygame.locals.QUIT:
                 self.running = False
-        elif event.type == pygame.locals.QUIT:
-            self.running = False
-
         if needs_redraw:
             self._draw_display()
 

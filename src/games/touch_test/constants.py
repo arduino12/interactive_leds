@@ -1,2 +1,1 @@
-FPS = 30
 RELEASED_COLOR = (0, 20, 0)
