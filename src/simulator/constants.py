@@ -24,5 +24,6 @@ RES_PATH = os.path.abspath(os.path.join(utils.upper_dir(os.path.realpath(
 PAWS_PATH = [os.path.join(RES_PATH, i) for i in (
     'leg_left.png', 'leg_right.png', 'hand_left.png', 'hand_right.png')]
 
-WINDOW_SIZE = [LED_SEP_PIXELS * 2 + LED_MAP[i - 1] for i in RGB_MATRIX_SIZE]
+WINDOW_SIZE = [LED_MAP[i - 1] + LED_SIZE_PIXELS + LED_SEP_PIXELS for i in
+    RGB_MATRIX_SIZE]
 WINDOW_TITLE = 'Interactive Leds Simulator %sx%s' % RGB_MATRIX_SIZE

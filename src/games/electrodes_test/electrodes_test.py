@@ -7,8 +7,8 @@ from . import constants
 from ..game_base import game_base
 
 
-class TouchTest(game_base.GameBase):
-    _logger = logging.getLogger('touch_test')
+class ElectrodesTest(game_base.GameBase):
+    _logger = logging.getLogger('electrodes_test')
 
     @staticmethod
     def _get_rand_color():

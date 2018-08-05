@@ -1,1 +1,0 @@
-RELEASED_COLOR = (0, 20, 0)
