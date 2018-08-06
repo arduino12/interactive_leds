@@ -1,0 +1,5 @@
+from ..game_base import colors as C
+
+ELECTRODE_COLOR = C.GREEN_255
+CIRCLE_COLOR = C.RED_255
+LINE_COLOR = C.WHITE
