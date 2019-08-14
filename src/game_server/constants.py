@@ -39,13 +39,13 @@ def _update_gamepad_params(panels_width, panels_height, snake):
 
 if HARDWARE_VERSION == 0:
     _update_gamepad_params(1, 2, 2)
-    RGB_MATRIX_OPTIONS.brightness = 100
+    RGB_MATRIX_OPTIONS.brightness = 70
     RGB_MATRIX_OPTIONS.gpio_slowdown = 0
     RGB_MATRIX_OPTIONS.multiplexing = 0
-    RGB_MATRIX_OPTIONS.pwm_bits = 6
+    RGB_MATRIX_OPTIONS.pwm_bits = 11
     MPR121_MAP = [
-        (None, None, 1, [6, 5, 7, 4, 3, 0, 2, 1]),
-        (None, None, 0, [14, 13, 15, 12, 11, 8, 10, 9]),
+        (None, None, 0, [5, 4, 0, 1, 2, 3, 7, 6]),
+        (None, None, 1, [10, 11, 15, 14, 13, 12, 8, 9]),
     ]
 elif HARDWARE_VERSION == 1:
     _update_gamepad_params(2, 3, 3)
